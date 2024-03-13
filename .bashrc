@@ -107,4 +107,4 @@ if ! shopt -oq posix; then
   fi
 fi
 
-#export PATH="$PATH:/sbin:/usr/sbin:usr/local/sbin"
+export PATH="$PATH:/sbin:/usr/sbin:usr/local/sbin"
