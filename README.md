@@ -1,3 +1,3 @@
-# updater
+# Bash
 
-Here are my scripts uo download and install executables.
+It's all about the bash config and scripts

@@ -1,10 +1,3 @@
-# if user is not root, pass all commands via sudo
-if [ $UID -ne 0 ]; then
-    alias reboot='sudo reboot'
-else
-    alias sudo=''
-fi
-
 # ls command (I use eza, an ls alt)
 alias ls='eza --all        --grid --git --time-style iso'
 alias la='eza --all        --grid --git --time-style iso'
