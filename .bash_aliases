@@ -13,7 +13,6 @@ alias lt='eza --all --long        --git --time-style iso --tree'
 
 # cd command behavior
 alias ..='cd ..'
-alias ..+'cd ~'
 
 up() {
     cd $(printf "%0.s../" $(seq 1 "$1"))
