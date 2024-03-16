@@ -1,7 +1,7 @@
 #!/bin/bash
 
 read -p 'Enter Server:' SERVER_NAME
-read -p 'Enter Domainname:' DOMAIN_NAME
+read -p 'Enter Domain:' DOMAIN_NAME
 
 read -p 'Enter base dir (eg. srv):' BASE_DIR
 read -p 'Enter a username, the server should run under:' SERVER_USER
