@@ -1,70 +1,60 @@
-#!/bin/bash
+#! /bin/bash
 
-read -p 'Enter Server:' SERVER_NAME
-read -p 'Enter Domain:' DOMAIN_NAME
-
-read -p 'Enter base dir (eg. srv):' BASE_DIR
-read -p 'Enter a username, the server should run under:' SERVER_USER
-
-SYSTEMD_FACTORIO_SERVICES='etc/systemd/system/factorio'
-
-if ! [ id "$SERVER_USER" &>/dev/null ]; then
-    useradd $SERVER_USER
+# Hostname
+read -p "Enter the servers hostname (how the game-server gets called):" HOSTNAME
+if [ "${HOSTNAME}" == "" ]; then
+    exit 1
 fi
 
-# setup systemd service
-mkdir -pv "/$SYSTEMD_FACTORIO_SERVICES"
-touch "/$SYSTEMD_FACTORIO_SERVICES/$SERVER_NAME.$DOMAIN_NAME.service"
-cat <<EOF > "/$SYSTEMD_FACTORIO_SERVICES/$SERVER_NAME.$DOMAIN_NAME.service"
+# Domain
+read -p "Enter the Domain under with the Server will be served (can be empty if not configured):" DOMAIN
+
+# Systemd service config path
+SYSTEMD_PATH="/etc/systemd/system"
+
+# Factorio game-servers base path
+echo -e "Don't provide sub dirs i.e. just type '/home/USER' and not '/home/USER/factorio-server-01' or something like that.\nIf you install many servers and want them in a servers dir, then you need to append that here."
+read -p "Enter the game base path (if empty the script uses pwd):" GAME_BASE_DIR
+if [ "${GAME_BASE_DIR}" == "" ]; then
+    GAME_BASE_DIR="$(pwd)"
+fi
+
+if [ "${DOMAIN}" == "" ]; then
+	GAME_DIR="${GAME_BASE_DIR}/${HOSTNAME}"
+	SERVICE_NAME=${HOSTNAME}.service
+else
+	GAME_DIR="${GAME_BASE_DIR}/${DOMAIN}/${HOSTNAME}"
+	SERVICE_NAME=${DOMAIN}.${HOSTNAME}.service
+fi
+
+mkdir -pv "${GAME_DIR}"
+cd "${GAME_DIR}" || exit 1
+
+echo "HOSTNAME: ${HOSTNAME}"
+echo "DOMAIN: ${DOMAIN}"
+echo "SYSTEMD_PATH: ${SYSTEMD_PATH}"
+echo "GAME_BASE_DIR: ${GAME_BASE_DIR}"
+echo "GAME_DIR: ${GAME_DIR}"
+
+#wget --no-verbose --continue --show-progress --no-dns-cache --xattr --content-disposition https://raw.githubusercontent.com/maximizzar/bash/master/factorio/update.sh
+#chmod +x updater.sh
+#./updater.sh
+
+read -p "Enter to create systemd service: (CTRL+C to stop)"
+
+cat <<EOF > "${SYSTEMD_PATH}/${SERVICE_NAME}"
 [Unit]
-Description=$SERVER_NAME.$DOMAIN_NAME.service
+Description=k2se.factorio.maximizzar.io
 
 [Service]
-ExecStart=/$BASE_DIR/$SERVER_NAME/factorio/bin/x64/factorio --start-server-load-latest --server-settings /$BASE_DIR/$SERVER_NAME/factorio/data/server-settings.json
-User=$SERVER_USER
+ExecStart=/srv/k2se/factorio/bin/x64/factorio --start-server-load-latest --server-settings /srv/k2se/factorio/data/server-settings.json
+User=factorio
 Type=simple
 Restart=on-failure
-RestartSec=10
+RestartSec=16
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-systemctl enable "/$SYSTEMD_FACTORIO_SERVICES/$SERVER_NAME.$DOMAIN_NAME.service"
-
-setup_server() {
-    mkdir -pv /$BASE_DIR/$SERVER_NAME
-    cd "/$BASE_DIR/$SERVER_NAME"
-    wget -O "$(pwd)/$SERVER_NAME.$DOMAIN_NAME.tar" https://factorio.com/get-download/latest/headless/linux64
-    tar -xvf "$(pwd)/$SERVER_NAME.$DOMAIN_NAME.tar" "$(pwd)/factorio/"
-    chmod +x $(pwd)/$SERVER_NAME.$DOMAIN_NAME/factorio/bin/x64/factorio
-    rm $(pwd)/$SERVER_NAME.$DOMAIN_NAME.tar $(pwd)/factorio/data/*example.json
-}
-
-setup_server
-
-# create update script
-touch "/$BASE_DIR/$SERVER_NAME/update.sh"
-
-cat <<EOF <"/$BASE_DIR/$SERVER_NAME/update.sh"
-systemctl stop "$SERVER_NAME.$DOMAIN_NAME.service"
-su "$SERVER_USER"
-
-cd /$BASE_DIR/$SERVER_NAME
-OLD_SERVER_VERSION=$'(./$BASE_DIR/$SERVER_NAME/factorio/bin/x64/factorio --version | grep -oP "Version: \K\d+\.\d+\.\d+")'
-tar -cvf $OLD_SERVER_VERSION factorio
-
-setup_server() {
-    mkdir -pv /$BASE_DIR/$SERVER_NAME
-    cd "/$BASE_DIR/$SERVER_NAME"
-    wget -O "$(pwd)/$SERVER_NAME.$DOMAIN_NAME.tar" https://factorio.com/get-download/latest/headless/linux64
-    tar -xvf "$(pwd)/$SERVER_NAME.$DOMAIN_NAME.tar" "$(pwd)/factorio/"
-    chmod +x $(pwd)/$SERVER_NAME.$DOMAIN_NAME/factorio/bin/x64/factorio
-    rm $(pwd)/$SERVER_NAME.$DOMAIN_NAME.tar $(pwd)/factorio/data/*example.json
-}
-setup_server
-exit
-systemctl start $SERVER_NAME.$DOMAIN_NAME.service
-EOF
-
-chown "/$BASE_DIR/$SERVER_NAME.$DOMAIN_NAME -R $SERVER_USER:$SERVER_USER"
+systemctl enable "${SERVICE_NAME}"
