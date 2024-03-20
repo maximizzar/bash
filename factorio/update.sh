@@ -1,5 +1,5 @@
 #!/bin/bash
-source=config
+source config
 
 if ! [ -e "config" ]; then
     echo "No config file found"
