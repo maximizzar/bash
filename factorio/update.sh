@@ -1,15 +1,20 @@
 #!/bin/bash
-FACTORIO_REMOTE="https://factorio.com/get-download/latest/headless/linux64"
-FACTORIO_GAME_DIR="/home/factorio/k2se"
+source=config
 
-# if first installation create dir
-if ! [ -e "${FACTORIO_GAME_DIR}" ]; then
-        echo "Start to init Server"
-        mkdir -pv ${FACTORIO_GAME_DIR}
+if ! [ -e "config" ]; then
+    echo "No config file found"
+    exit 1
 fi
 
-cd "${FACTORIO_GAME_DIR}" || exit 1
-SERVER_OLD_VERSION=$(/home/factorio/k2se/factorio/bin/x64/factorio --version | grep -oP 'Version: \K\d+\.\d+\.\d+')
+FACTORIO_REMOTE="https://factorio.com/get-download/latest/headless/linux64"
+
+# if first installation create dir
+if ! [ -e "${GAME_DIR}" ]; then
+        mkdir -pv ${GAME_DIR}
+fi
+
+cd "${GAME_DIR}" || exit 1
+SERVER_OLD_VERSION=$(${GAME_DIR}/factorio/bin/x64/factorio --version | grep -oP 'Version: \K\d+\.\d+\.\d+')
 SERVER_NEW_VERSION=$(wget -S --spider "${FACTORIO_REMOTE}" 2>&1 | grep 'Location' | awk '{print $2}' | grep -oP '(\d+\.\d+\.\d+)' | head -1)
 
 echo "local version: ${SERVER_OLD_VERSION}"
@@ -23,10 +28,10 @@ fi
 echo "Start updating process"
 
 echo "Stop Server"
-sudo systemctl stop k2se.factorio.maximizzar.io.service
+sudo systemctl stop "${SERVICE_NAME}"
 
 echo "Backup old (local) Server-files"
-tar -cvf "factorio_${SERVER_OLD_VERSION}.tar" factorio
+tar -cvf "factorio-${SERVER_OLD_VERSION}.tar" factorio
 
 echo "Install new (remove) Server-files"
 wget --no-verbose -O factorio.tar.xz ${FACTORIO_REMOTE}
@@ -43,5 +48,5 @@ for file in factorio/data/*example.json; do
 done
 
 echo "Start Server"
-sudo systemctl start k2se.factorio.maximizzar.io.service
+sudo systemctl start "${SERVICE_NAME}"
 exit 0
