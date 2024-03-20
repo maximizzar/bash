@@ -1,20 +1,20 @@
 #! /bin/bash
 
 # Hostname
-read -p -r "Enter the servers hostname (how the game-server gets called):" HOSTNAME
+read -p "Enter the servers hostname (how the game-server gets called):" HOSTNAME
 if [ "${HOSTNAME}" == "" ]; then
     exit 1
 fi
 
 # Domain
-read -p -r "Enter the Domain under with the Server will be served (can be empty if not configured):" DOMAIN
+read -p "Enter the Domain under with the Server will be served (can be empty if not configured):" DOMAIN
 
 # Systemd service config path
 SYSTEMD_PATH="/etc/systemd/system"
 
 # Factorio game-servers base path
 echo -e "Don't provide sub dirs i.e. just type '/home/USER' and not '/home/USER/factorio-server-01' or something like that.\nIf you install many servers and want them in a servers dir, then you need to append that here."
-read -p -r "Enter the game base path (if empty the script uses pwd):" GAME_BASE_DIR
+read -p "Enter the game base path (if empty the script uses pwd):" GAME_BASE_DIR
 if [ "${GAME_BASE_DIR}" == "" ]; then
     GAME_BASE_DIR="$(pwd)"
 fi
