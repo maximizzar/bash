@@ -44,5 +44,5 @@ if ! [ -e "${SYSTEMD_PATH}/${SERVICE_NAME}" ]; then
 fi
 
 wget --no-verbose --continue --show-progress --no-dns-cache --xattr --content-disposition https://raw.githubusercontent.com/maximizzar/bash/master/factorio/update.sh
-chmod +x updater.sh
-./updater.sh
+chmod +x update.sh
+./update.sh
