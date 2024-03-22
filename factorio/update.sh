@@ -40,9 +40,15 @@ chmod +x factorio/bin/x64/factorio
 
 rm factorio.tar.xz
 
-for file in factorio/data/*example.json; do
-    if [[ -e "${file}" ]]; then
-        rm "${file}"
+# Deal with the json config example files
+for example_file in "${GAME_DIR}/factorio/data/*.example.json"; do
+    output_file="${example_file%.example.json}.json"
+
+    if [ -e "${output_file}" ]; then
+        rm "${example_file}"
+    else
+        mv "${example_file}" "${output_file}"
+        nano "${output_file}"
     fi
 done
 
