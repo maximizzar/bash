@@ -49,7 +49,7 @@ Description=A Factorio Game-Server at: ${HOSTNAME}.${DOMAIN}.
 
 [Service]
 ExecStart=${GAME_DIR}/factorio/bin/x64/factorio --start-server-load-latest --server-settings ${GAME_DIR}/factorio/data/server-settings.json
-User="$(whoami)"
+User=$(whoami)
 Type=simple
 Restart=on-failure
 RestartSec=10
