@@ -35,7 +35,7 @@ fi
 
 echo "Install new (remote) Server-files"
 wget --no-verbose -O factorio.tar.xz ${FACTORIO_REMOTE}
-tar --overwrite -xvf factorio.tar.xz .
+tar --overwrite -xvf factorio.tar.xz
 chmod +x factorio/bin/x64/factorio
 
 rm factorio.tar.xz
