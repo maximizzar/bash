@@ -43,7 +43,7 @@ cd "${GAME_DIR}" || exit 1
 } >> config
 
 # Create Systemd service
-cat >"${SYSTEMD_PATH}/${SERVICE_NAME}" <<EOF
+sudo cat >"${SYSTEMD_PATH}/${SERVICE_NAME}" <<EOF
 [Unit]
 Description=A Factorio Game-Server at: ${HOSTNAME}.${DOMAIN}.
 
