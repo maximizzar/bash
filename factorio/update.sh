@@ -45,18 +45,21 @@ if [ -e "${GAME_DIR}/factorio/data/map-gen-settings.json" ]; then
     rm "${GAME_DIR}/factorio/data/map-gen-settings.example.json"
 else
     mv "${GAME_DIR}/factorio/data/map-gen-settings.example.json" "${GAME_DIR}/factorio/data/map-gen-settings.json"
+    nano "${GAME_DIR}/factorio/data/map-gen-settings.json"
 fi
 
 if [ -e "${GAME_DIR}/factorio/data/map-settings.json" ]; then
     rm "${GAME_DIR}/factorio/data/map-settings.example.json"
 else
     mv "${GAME_DIR}/factorio/data/map-settings.example.json" "${GAME_DIR}/factorio/data/map-settings.json"
+    nano "${GAME_DIR}/factorio/data/map-settings.json"
 fi
 
 if [ -e "${GAME_DIR}/factorio/data/server-settings.json" ]; then
     rm "${GAME_DIR}/factorio/data/server-settings.example.json"
 else
     mv "${GAME_DIR}/factorio/data/server-settings.example.json" "${GAME_DIR}/factorio/data/server-settings.json"
+    nano "${GAME_DIR}/factorio/data/server-settings.json"
 fi
 
 if [ -e "${GAME_DIR}/factorio/data/server-whitelist.json" ]; then
