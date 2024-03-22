@@ -43,7 +43,7 @@ cd "${GAME_DIR}" || exit 1
 } >> config
 
 # Create Systemd service
-sudo cat >"${SYSTEMD_PATH}/${SERVICE_NAME}" <<EOF
+sudo tee "${SYSTEMD_PATH}/${SERVICE_NAME}" <<EOF
 [Unit]
 Description=A Factorio Game-Server at: ${HOSTNAME}.${DOMAIN}.
 
@@ -65,7 +65,7 @@ sudo systemctl stop ${SERVICE_NAME}
 ${GAME_DIR}/factorio/bin/x64/factorio --create ${GAME_DIR}/factorio/saves/world.zip --map-gen-settings ${GAME_DIR}/factorio/data/map-gen-settings.json
 sudo systemctl start ${SERVICE_NAME}
 EOF
-chmod world-gen.sh
+chmod +x world-gen.sh
 
 # Download update script, make it executable and run it to install the actual server
 wget --no-verbose --continue --show-progress --no-dns-cache --xattr --content-disposition https://raw.githubusercontent.com/maximizzar/bash/master/factorio/update.sh
