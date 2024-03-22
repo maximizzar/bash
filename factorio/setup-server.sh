@@ -27,9 +27,9 @@ else
 	SERVICE_NAME=${HOSTNAME}.${DOMAIN}.service
 fi
 
+# Create Directory Structure for Server installation
 mkdir -pv "${GAME_DIR}"
 cd "${GAME_DIR}" || exit 1
-
 {
     echo "HOSTNAME=${HOSTNAME}"
     echo "DOMAIN=${DOMAIN}"
@@ -39,10 +39,31 @@ cd "${GAME_DIR}" || exit 1
     echo "SERVICE_NAME=${SERVICE_NAME}"
 } >> config
 
-if ! [ -e "${SYSTEMD_PATH}/${SERVICE_NAME}" ]; then
-    echo "Please create a systemd service first under: ${SYSTEMD_PATH}/${SERVICE_NAME}"
-fi
+# Create Systemd service
+cat >"${SYSTEMD_PATH}/${SERVICE_NAME}" <<EOF
+[Unit]
+Description=A Factorio Game-Server at: ${HOSTNAME}.${DOMAIN}.
 
+[Service]
+ExecStart=${GAME_DIR}/factorio/bin/x64/factorio --start-server-load-latest --server-settings ${GAME_DIR}/factorio/data/server-settings.json
+User="$(whoami)"
+Type=simple
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl enable ${SERVICE_NAME}
+
+# Create world-gen script
+cat >"${GAME_DIR}/world-gen.sh" <<EOF
+sudo systemctl stop ${SERVICE_NAME}
+${GAME_DIR}/factorio/bin/x64/factorio --create ${GAME_DIR}/factorio/saves/world.zip --map-gen-settings ${GAME_DIR}/factorio/data/map-gen-settings.json
+sudo systemctl start ${SERVICE_NAME}
+EOF
+
+# Download update script, make it executable and run it to install the actual server
 wget --no-verbose --continue --show-progress --no-dns-cache --xattr --content-disposition https://raw.githubusercontent.com/maximizzar/bash/master/factorio/update.sh
 chmod +x update.sh
 ./update.sh
