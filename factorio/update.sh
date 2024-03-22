@@ -15,7 +15,7 @@ fi
 
 cd "${GAME_DIR}" || exit 1
 
-if [ -d "${GAME_DIR}/factorio}" ]; then
+if [ -e "${GAME_DIR}/factorio/bin/x64/factorio" ]; then
     SERVER_OLD_VERSION=$(${GAME_DIR}/factorio/bin/x64/factorio --version | grep -oP 'Version: \K\d+\.\d+\.\d+')
     SERVER_NEW_VERSION=$(wget -S --spider "${FACTORIO_REMOTE}" 2>&1 | grep 'Location' | awk '{print $2}' | grep -oP '(\d+\.\d+\.\d+)' | head -1)
 
@@ -41,16 +41,33 @@ chmod +x factorio/bin/x64/factorio
 rm factorio.tar.xz
 
 # Deal with the json config example files
-for example_file in "${GAME_DIR}/factorio/data/*.example.json"; do
-    output_file="${example_file%.example.json}.json"
+if [ -e "${GAME_DIR}/factorio/data/map-gen-settings.json" ]; then
+    rm "${GAME_DIR}/factorio/data/map-gen-settings.example.json"
+else
+    mv "${GAME_DIR}/factorio/data/map-gen-settings.example.json" "${GAME_DIR}/factorio/data/map-gen-settings.json"
+    nano "${GAME_DIR}/factorio/data/map-gen-settings.json"
+fi
 
-    if [ -e "${output_file}" ]; then
-        rm "${example_file}"
-    else
-        mv "${example_file}" "${output_file}"
-        nano "${output_file}"
-    fi
-done
+if [ -e "${GAME_DIR}/factorio/data/map-settings.json" ]; then
+    rm "${GAME_DIR}/factorio/data/map-settings.example.json"
+else
+    mv "${GAME_DIR}/factorio/data/map-settings.example.json" "${GAME_DIR}/factorio/data/map-gen-settings.json"
+    nano "${GAME_DIR}/factorio/data/map-settings.json"
+fi
+
+if [ -e "${GAME_DIR}/factorio/data/server-settings.json" ]; then
+    rm "${GAME_DIR}/factorio/data/server-settings.example.json"
+else
+    mv "${GAME_DIR}/factorio/data/server-settings.example.json" "${GAME_DIR}/factorio/data/map-gen-settings.json"
+    nano "${GAME_DIR}/factorio/data/server-settings.json"
+fi
+
+if [ -e "${GAME_DIR}/factorio/data/server-whitelist.json" ]; then
+    rm "${GAME_DIR}/factorio/data/server-whitelist.example.json"
+else
+    mv "${GAME_DIR}/factorio/data/server-whitelist.example.json" "${GAME_DIR}/factorio/data/map-gen-settings.json"
+    nano "${GAME_DIR}/factorio/data/server-whitelist.json"
+fi
 
 echo "Start Server"
 sudo systemctl start "${SERVICE_NAME}"
