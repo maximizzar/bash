@@ -1,5 +1,8 @@
 #! /bin/bash
 
+echo "Importand: What you need before running this script."
+echo "At best a new user. That user needs sudo privileges. Those are needed maily to deal with systemd service creation and than the start and stop process"
+
 # Hostname
 read -p "Enter the servers hostname (how the game-server gets called):" HOSTNAME
 if [ "${HOSTNAME}" == "" ]; then
@@ -62,6 +65,7 @@ sudo systemctl stop ${SERVICE_NAME}
 ${GAME_DIR}/factorio/bin/x64/factorio --create ${GAME_DIR}/factorio/saves/world.zip --map-gen-settings ${GAME_DIR}/factorio/data/map-gen-settings.json
 sudo systemctl start ${SERVICE_NAME}
 EOF
+chmod world-gen.sh
 
 # Download update script, make it executable and run it to install the actual server
 wget --no-verbose --continue --show-progress --no-dns-cache --xattr --content-disposition https://raw.githubusercontent.com/maximizzar/bash/master/factorio/update.sh
