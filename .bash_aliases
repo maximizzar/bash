@@ -49,7 +49,3 @@ alias neofetch='neofetch --title_fqdn on --speed_shorthand on --cpu_temp C --mem
 
 # fzf defaults
 alias fzf='fzf --color 16'
-
-# use different tools please
-alias top='btop'
-alias apt='nala'
