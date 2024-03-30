@@ -11,6 +11,13 @@ if [ $UID != 0 ]; then
     exit 1;
 fi
 
+read -p "Do you want to add the apt-cache-ng config? (Y/n): " 01proxy
+if [ -z "$01proxy" == "y" ] || [ "$01proxy" == "Y" ]; then
+    cd /etc/apt/apt.conf.d
+    wget https://raw.githubusercontent.com/maximizzar/bash/master/etc/apt/apt.conf.d/01proxy
+    cd $HOME
+fi
+
 echo "Install repos"
 apt install -y gpg
 
