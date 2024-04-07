@@ -49,3 +49,9 @@ alias neofetch='neofetch --title_fqdn on --speed_shorthand on --cpu_temp C --mem
 
 # fzf defaults
 alias fzf='fzf --color 16'
+
+# yt-dlp defaults
+alias yt-dlp='yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats  --write-subs --netrc --audio-quality 0 --embed-metadata --embed-thumbnail --xattrs'
+
+# gallery-dl defaults
+alias gallery-dl='gallery-dl --mtime date'
