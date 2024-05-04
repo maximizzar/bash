@@ -7,6 +7,8 @@ max=40
 #Interval in seconds
 interval=5
 
+# shellcheck disable=SC2046
+rtcwake --utc --time $(date --date 'tomorrow 19:00 CEST' -u +%s) --mode no
 
 #Continue until we shutdown
 while true; do
@@ -22,12 +24,7 @@ while true; do
         if  ((count >= max)); then
             zfs_scrub
             echo "Time to shutdown!"
-            current_time=$(date +%H%M)
-            if [ "$current_time" -ge 1700 ]; then
-                rtcwake --utc --time "$(date --date 'TZ=UTC tomorrow 17:00' +%s)" --mode mem
-            else
-                rtcwake --utc --time "$(date --date 'TZ=UTC today 17:00' +%s)" --mode mem
-            fi
+            shutdown 0
         fi
     fi
     #Delay by interval to next check
