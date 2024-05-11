@@ -4,7 +4,7 @@
 if [ -z "$1" ]; then
     #echo "Please provide a directory or a file as an argument."
     #exit 1
-    1="$(pwd)
+    1="$(pwd)"
 fi
 
 cd "$1" || exit 1
