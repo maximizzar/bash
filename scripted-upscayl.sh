@@ -1,13 +1,20 @@
 #!/bin/bash
 
-cd ~/test || exit
-
 SOURCE_FULL_PATH="$1"
 SOURCE_VIDEO=$(basename "$SOURCE_FULL_PATH")
 SOURCE_LENGTH_IN_FRAMES=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 "$SOURCE_FULL_PATH")
 FRAMERATE=$(ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 "$SOURCE_FULL_PATH")
 
-MODEL="uniscale_restore"
+MODEL="$2"
+
+if [ "$MODEL" == "uniscale_restore" ]; then
+  MODEL_PATH="../custom-models/models"
+fi
+
+if [ "$MODEL" == "realesrgan-x4plus-anime" ]; then
+  MODEL_PATH="/opt/Upscayl/resources/models"
+fi
+
 PROJECT_NAME=$(echo -n "$SOURCE_VIDEO" | md5sum | cut -d ' ' -f 1)
 
 # init project to start the upscale process.
@@ -50,8 +57,8 @@ cd original || exit 1
 (
     cd original || exit 1
     for sub_dir in */; do
-      if ! [ "$(ls "$sub_dir" | wc -l)" == "$(ls ../upscale/$MODEL/$sub_dir | wc -l)" ]; then
-        (cd ../ && upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s 2 -m "../custom-models/models" -n uniscale_restore -f png -c 0)
+      if [ "$(find "$sub_dir" -maxdepth 1 -type f | wc -l)" -ne "$(find ../upscale/"$MODEL"/"$sub_dir" -maxdepth 1 -type f | wc -l)" ]; then
+        (cd ../ && upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s 2 -m "$MODEL_PATH" -n "$MODEL" -f png -c 0)
       fi
     done
 )
