@@ -1,4 +1,5 @@
 #!/bin/bash
+alias sudo=""
 echo "Only when .bashrc and .bash_aliases respectively removed, the script will pull configs remotely."
 read -p "Press Enter to proceed: "
 
@@ -21,9 +22,13 @@ fi
 echo "Install repos"
 apt install -y gpg
 
-if ! [ -f "/etc/apt/sources.list.d/volian-archive-scar-unstable.list" ]; then
-    echo "deb http://deb.volian.org/volian/ scar main" | tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list
-    wget -qO - https://deb.volian.org/volian/scar.key | tee /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg
+if [ -f "/etc/apt/sources.list.d/volian-archive-scar-unstable.list" ]; then
+    rm /etc/apt/sources.list.d/volian-archive-scar-unstable.list
+    rm /etc/apt/trusted.gpg.d/volian-archive-scar-unstable.gpg
+fi
+
+if ! [ -f "/etc/apt/sources.list.d/volian-archive-nala-unstable.sources" ]; then
+ wget https://gitlab.com/volian/volian-archive/-/raw/main/install-nala.sh | bash
 fi
 
 if ! [ -f "/etc/apt/sources.list.d/gierens.list" ]; then
@@ -35,4 +40,4 @@ fi
 
 echo "Install tools"
 apt update
-apt install -y colordiff btop nala eza fzf neofetch
+apt install -y colordiff btop eza fzf neofetch
