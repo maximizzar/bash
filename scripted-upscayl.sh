@@ -69,5 +69,5 @@ if [ -z "$(ffmpeg -i "$SOURCE_FULL_PATH" 2>&1 | grep Stream | grep -i audio)" ];
   ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/000/%d.png" -c:v libsvtav1 -crf 28 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
 else
   # Encode Video with av1 and aac
-  ffmpeg -i "$SOURCE_FULL_PATH" -vn -c:a pcm_s16le -f wav pipe: | ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/000/%d.png" -i pipe: -c:v libsvtav1 -crf 28 -b:v 0 -r "$FRAMERATE" -c:a aac "$SOURCE_VIDEO"
+  ffmpeg -i "$SOURCE_FULL_PATH" -vn -c:a pcm_s16le -f wav pipe: | ffmpeg -framerate "$FRAMERATE" -pattern_type glob -i "upscale/$MODEL/*/*.png" -i pipe: -c:v libsvtav1 -crf 24 -b:v 0 -r "$FRAMERATE" -c:a aac "$SOURCE_VIDEO"
 fi
