@@ -21,7 +21,7 @@ cd "$1" || exit 1
 for file in "$1"/*; do
     if [ -f "$file" ]; then
       if ! [ -f "re-encode/$file"  ]; then
-        ffmpeg -i "$file" -map 0 -c copy -c:v libsvtav1 -crf 24 -b:v 0 "re-encode/$file"
+        ffmpeg -i "$file" -map 0 -c:v libsvtav1 -crf 23 -b:v 0 "re-encode/$file"
       fi
     fi
 done
