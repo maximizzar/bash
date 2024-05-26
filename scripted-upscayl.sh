@@ -1,19 +1,57 @@
 #!/bin/bash
 
+MODEL="$2"
+MODEL_PATH="../models"
+
+# if in install mode, install dependencies
+if [ "$1" == "install" ]; then
+        apt install curl zip git || echo "apt failed to install packages. Check privileges, connection and dns!" && exit 1
+        upscayl_ncnn_release_api="https://api.github.com/repos/upscayl/upscayl-ncnn/releases/latest"
+        upscayl_ncnn_release_tag=$(curl --silent "$upscayl_ncnn_release_api" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+        upscayl_release_api="https://api.github.com/repos/upscayl/upscayl/releases/latest"
+        upscayl_release_tag="$(curl --silent "$upscayl_release_api" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')"
+
+        (
+                # Download upscayl, upscayl-bin and custom models
+                cd /tmp || exit 1
+                wget "https://github.com/upscayl/upscayl-ncnn/releases/tag/$upscayl_ncnn_release_tag/upscayl-bin-$upscayl_ncnn_release_tag-linux.zip"
+                wget "https://github.com/upscayl/upscayl/releases/tag/v$upscayl_release_tag/upscayl-$upscayl_release_tag-linux.zip"
+                unzip "upscayl-bin-$upscayl_ncnn_release_tag-linux.zip"
+                unzip "upscayl-$upscayl_release_tag-linux"
+
+                git clone https://github.com/upscayl/custom-models.git
+        )
+
+        (
+                # copy binary and models into their correct dirs
+                cp "/tmp/upscayl-bin-$upscayl_ncnn_release_tag-linux/upscayl-bin" "/usr/local/bin/upscayl"
+                chmod +x /usr/local/bin/upscayl
+
+                cd "$MODEL_PATH" || exit 1
+                cp /tmp/resources/models/* .
+                cp /tmp/custom-models/models/* .
+        )
+
+        echo "Installation done. Have fun!"
+        exit 0
+fi
+
+# check if chosen model is installed
+if ! [  -d "$MODEL_PATH" ]; then
+        echo "Make sure your path is correct or create a models dir."
+        exit 1
+fi
+
+if ! [ -f "$MODEL_PATH/$MODEL.bin"  ]; then
+        echo "Please put your chosen model into the models dir or check the provided name."
+        exit 1
+fi
+
 SOURCE_FULL_PATH="$1"
 SOURCE_VIDEO=$(basename "$SOURCE_FULL_PATH")
-SOURCE_LENGTH_IN_FRAMES=$(ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames -of default=nokey=1:noprint_wrappers=1 "$SOURCE_FULL_PATH")
+SOURCE_LENGTH_IN_FRAMES=$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of default=nokey=1:noprint_wrappers=1 -i "$SOURCE_FULL_PATH")
 FRAMERATE=$(ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 "$SOURCE_FULL_PATH")
-
-MODEL="$2"
-
-if [ "$MODEL" == "uniscale_restore" ]; then
-  MODEL_PATH="../custom-models/models"
-fi
-
-if [ "$MODEL" == "realesrgan-x4plus-anime" ]; then
-  MODEL_PATH="/opt/Upscayl/resources/models"
-fi
 
 PROJECT_NAME=$(echo -n "$SOURCE_VIDEO" | md5sum | cut -d ' ' -f 1)
 
@@ -63,11 +101,14 @@ cd original || exit 1
     done
 )
 
+# move frames into upscale/$MODEL dir, because idk how to deal with sub-dirs in ffmpeg
+mv upscale/"$MODEL"/*/*.png upscale/"$MODEL"/.
+
 # Check if the Media Container has an audio stream
 if [ -z "$(ffmpeg -i "$SOURCE_FULL_PATH" 2>&1 | grep Stream | grep -i audio)" ]; then
   # Encode Video with av1
-  ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/000/%d.png" -c:v libsvtav1 -crf 28 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
+  ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -c:v libsvtav1 -crf 28 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
 else
   # Encode Video with av1 and aac
-  ffmpeg -i "$SOURCE_FULL_PATH" -vn -c:a pcm_s16le -f wav pipe: | ffmpeg -framerate "$FRAMERATE" -pattern_type glob -i "upscale/$MODEL/*/*.png" -i pipe: -c:v libsvtav1 -crf 24 -b:v 0 -r "$FRAMERATE" -c:a aac "$SOURCE_VIDEO"
+  ffmpeg -i "$SOURCE_FULL_PATH" -vn -c:a pcm_s16le -f wav pipe: | ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -i pipe: -c:v libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -c:a aac "$SOURCE_VIDEO"
 fi
