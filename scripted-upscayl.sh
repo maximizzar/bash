@@ -53,7 +53,7 @@ SOURCE_VIDEO=$(basename "$SOURCE_FULL_PATH")
 SOURCE_LENGTH_IN_FRAMES=$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of default=nokey=1:noprint_wrappers=1 -i "$SOURCE_FULL_PATH")
 FRAMERATE=$(ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 "$SOURCE_FULL_PATH")
 
-PROJECT_NAME=$(echo -n "$SOURCE_VIDEO" | md5sum | cut -d ' ' -f 1)
+PROJECT_NAME="$SOURCE_VIDEO: $(echo -n "$SOURCE_VIDEO" | md5sum | cut -d ' ' -f 1)"
 
 # init project to start the upscale process.
 mkdir -p "$PROJECT_NAME" && cd "$PROJECT_NAME" || exit 1
@@ -91,18 +91,31 @@ cd original || exit 1
   fi
 )
 
-# Iterate through subdirectories and upscale frames.
-(
-    cd original || exit 1
-    for sub_dir in */; do
-      if [ "$(find "$sub_dir" -maxdepth 1 -type f | wc -l)" -ne "$(find ../upscale/"$MODEL"/"$sub_dir" -maxdepth 1 -type f | wc -l)" ]; then
-        (cd ../ && upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s 2 -m "$MODEL_PATH" -n "$MODEL" -f png -c 0)
-      fi
-    done
-)
+# Skip upscayl completly if it's 100% done
+if [ "$(find "original" -type f | wc -l)" -ne "$(find "upscale/$MODEL" -maxdepth 1 -type f | wc -l)" ]; then
+        (
+                # Iterate through subdirectories and upscale frames.
+                cd original || exit 1
+                for sub_dir in */; do
+                          if [ "$(find "$sub_dir" -maxdepth 1 -type f | wc -l)" -ne "$(find ../upscale/"$MODEL"/"$sub_dir" -maxdepth 1 -type f | wc -l)" ]; then
+                                    (cd ../ && upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s 2 -m "$MODEL_PATH" -n "$MODEL" -f png -c 0)
+                          fi
+                done
+        )
 
-# move frames into upscale/$MODEL dir, because idk how to deal with sub-dirs in ffmpeg
-mv upscale/"$MODEL"/*/*.png upscale/"$MODEL"/.
+        (
+                # move frames into upscale/$MODEL dir, because idk how to deal with sub-dirs in ffmpeg
+                cd "upscayl/$MODEL" || exit 1
+                for sub_dir in */; do
+                        mv ./*.png ../
+                done
+        )
+fi
+
+ffmpeg -i "$SOURCE_FULL_PATH" -vn -c copy /tmp/no_video.mp4
+ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -i "/tmp/no_video.mp4" -map 0:v -map 1 -c copy -c:v libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
+rm /tmp/no_video.mp4
+exit 0
 
 # Check if the Media Container has an audio stream
 if [ -z "$(ffmpeg -i "$SOURCE_FULL_PATH" 2>&1 | grep Stream | grep -i audio)" ]; then
@@ -112,3 +125,11 @@ else
   # Encode Video with av1 and aac
   ffmpeg -i "$SOURCE_FULL_PATH" -vn -c:a pcm_s16le -f wav pipe: | ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -i pipe: -c:v libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -c:a aac "$SOURCE_VIDEO"
 fi
+
+
+ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -i "$SOURCE_FULL_PATH" -map 0 -map -0:v -c copy -c:v libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
+
+
+rsync --archive --xattrs --owner --group --times --atimes --open-noatime --crtimes --delete --progress --ipv6 --dry-run /local-zfs/data/videos/movies/ ssh root@proxmox-backup-server:/mnt/datastore/local-zfs/data/videos/movies
+
+rsync --dry-run /local-zfs/data/videos/movies/ ssh root@proxmox-backup-server:/mnt/datastore/local-zfs/data/videos/movies
