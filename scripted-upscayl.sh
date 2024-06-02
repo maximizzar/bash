@@ -1,7 +1,22 @@
 #!/bin/bash
 
-MODEL="$2"
-MODEL_PATH="../models"
+# Set Path vars
+WORKING_DIR=""
+MODEL_PATH="$WORKING_DIR/models"
+SOURCE_FULL_PATH="$1"
+
+if [ WORKING_DIR == "" ]; then
+        echo "please set WORKING_DIR var! Please use absolute a Path!" && exit 1
+else
+        mkdir -p "$WORKING_DIR" && cd "$WORKING_DIR" || exit 1
+fi
+
+# Set Model (cli argument or default)
+if [ -n "$2" ]; then
+        MODEL="$2"
+else
+        MODEL="uniscale_restore"
+fi
 
 # if in install mode, install dependencies
 if [ "$1" == "install" ]; then
@@ -48,7 +63,6 @@ if ! [ -f "$MODEL_PATH/$MODEL.bin"  ]; then
         exit 1
 fi
 
-SOURCE_FULL_PATH="$1"
 SOURCE_VIDEO=$(basename "$SOURCE_FULL_PATH")
 SOURCE_LENGTH_IN_FRAMES=$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of default=nokey=1:noprint_wrappers=1 -i "$SOURCE_FULL_PATH")
 FRAMERATE=$(ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 "$SOURCE_FULL_PATH")
@@ -63,7 +77,7 @@ if [ -f "$SOURCE_VIDEO" ]; then
     echo "bye bye" && exit 1
 fi
 
-# create dir for video frame and for the upscale output
+# create dir for video frames
 mkdir -p original
 
 if [ "$(find original -type f | wc -l)" -lt "$SOURCE_LENGTH_IN_FRAMES" ]; then
@@ -83,15 +97,7 @@ cd original || exit 1
   fi
 )
 
-# Download the upscayl custom-models if not present yet
-(
-  cd ..
-  if ! [ -d custom-models/models ]; then
-    git clone https://github.com/upscayl/custom-models
-  fi
-)
-
-# Skip upscayl completly if it's 100% done
+# Skip upscayl completely if it's 100% done
 if [ "$(find "original" -type f | wc -l)" -ne "$(find "upscale/$MODEL" -maxdepth 1 -type f | wc -l)" ]; then
         (
                 # Iterate through subdirectories and upscale frames.
@@ -112,24 +118,6 @@ if [ "$(find "original" -type f | wc -l)" -ne "$(find "upscale/$MODEL" -maxdepth
         )
 fi
 
-ffmpeg -i "$SOURCE_FULL_PATH" -vn -c copy /tmp/no_video.mp4
-ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -i "/tmp/no_video.mp4" -map 0:v -map 1 -c copy -c:v libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
-rm /tmp/no_video.mp4
-exit 0
-
-# Check if the Media Container has an audio stream
-if [ -z "$(ffmpeg -i "$SOURCE_FULL_PATH" 2>&1 | grep Stream | grep -i audio)" ]; then
-  # Encode Video with av1
-  ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -c:v libsvtav1 -crf 28 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
-else
-  # Encode Video with av1 and aac
-  ffmpeg -i "$SOURCE_FULL_PATH" -vn -c:a pcm_s16le -f wav pipe: | ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -i pipe: -c:v libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -c:a aac "$SOURCE_VIDEO"
-fi
-
-
-ffmpeg -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -i "$SOURCE_FULL_PATH" -map 0 -map -0:v -c copy -c:v libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" "$SOURCE_VIDEO"
-
-
-rsync --archive --xattrs --owner --group --times --atimes --open-noatime --crtimes --delete --progress --ipv6 --dry-run /local-zfs/data/videos/movies/ ssh root@proxmox-backup-server:/mnt/datastore/local-zfs/data/videos/movies
-
-rsync --dry-run /local-zfs/data/videos/movies/ ssh root@proxmox-backup-server:/mnt/datastore/local-zfs/data/videos/movies
+# Get Video Resolution and generate output file.
+Resolution=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$SOURCE_FULL_PATH")
+ffmpeg -i "$SOURCE_FULL_PATH" -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -map_metadata 0 -map 0 -map -0:v:0 -map 1:v:0 -c copy -c:v:0 libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -s "$Resolution" "$SOURCE_VIDEO"
