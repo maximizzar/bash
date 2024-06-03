@@ -120,4 +120,4 @@ fi
 
 # Get Video Resolution and generate output file.
 Resolution=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$SOURCE_FULL_PATH")
-ffmpeg -i "$SOURCE_FULL_PATH" -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -map_metadata 0 -map 0 -map -0:v:0 -map 1:v:0 -c copy -c:v:0 libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -s "$Resolution" "$SOURCE_VIDEO"
+ffmpeg -i "$SOURCE_FULL_PATH" -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -map_metadata 0 -map 1:v:0 -map 0 -map -0:v:0 -c copy -c:v:0 libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -s "$Resolution" "$SOURCE_VIDEO"
