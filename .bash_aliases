@@ -14,7 +14,7 @@ up() {
 # Create parent directories on demand
 alias mkdir='mkdir -pv'
 
-#Colorize diff output
+# Colorize diff output
 alias diff='colordiff'
 
 # Mount command Pretty and readable
@@ -29,17 +29,17 @@ alias ports='ss -tupln'
 alias ipa='ip address show'
 alias ipas='ip address show'
 
-alias wget='wget --no-verbose --continue --show-progress --no-dns-cache --xattr --content-disposition'
+alias wget='wget --no-verbose --continue --show-progress --no-dns-cache --content-disposition'
 
 # safety nets
 alias rm='rm -I --preserve-root'
 
-# confirmation #
+# confirmation
 alias mv='mv --interactive'
 alias cp='cp --archive --interactive --update'
 alias ln='ln --interactive --verbose'
 
-# Parenting changing perms on / #
+# Parenting changing perms on
 alias chown='chown --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chgrp='chgrp --preserve-root'
@@ -55,3 +55,13 @@ alias yt-dlp='yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer
 
 # gallery-dl defaults
 alias gallery-dl='gallery-dl --mtime date'
+
+# radeontop defaults
+alias radeontop='radeontop --color --ticks 180 --transparency'
+
+# shellcheck with color
+alias shellcheck='shellcheck --color=always'
+
+# ps aliases
+alias ps='ps -lt'
+alias pst='ps axjf'
