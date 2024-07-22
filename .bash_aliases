@@ -1,15 +1,13 @@
 # list short
-alias ls='eza --long --across --dereference --all --smart-group --numeric --time-style '+%Y-%m-%d' --no-permissions --octal-permissions'
-
+alias ls='eza --long --grid --across --dereference --all --smart-group --numeric --time-style '+%Y-%m-%d'       --no-permissions --octal-permissions'
 # list alt
-alias la='eza --long --across --dereference --all --smart-group --numeric --time-style long-iso --git --git-repos --extended --context'
-
+alias la='eza --long --grid --across --dereference --all --smart-group --mounts --numeric --time-style long-iso'
 # list long
-alias ll='eza --long --across --dereference --all --smart-group --mounts --time-style long-iso --no-permissions --octal-permissions --git --git-repos --extended --context'
+alias ll='eza --long        --across --dereference --all --smart-group --mounts           --time-style long-iso --no-permissions --octal-permissions --git --git-repos --extended --context'
 
 # list tree
 lt() {
-        if [ $1 = "" ]; then
+        if [ -z "$1" ]; then
                 eza --tree --all
         else
                 eza --tree --all --level "$1"
