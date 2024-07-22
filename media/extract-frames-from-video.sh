@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# extracts frames from a given video steam and saves then in a directory
+
+# Make sure every Program is installed for the script to run!
+if ! [ "$(command -v ffmpeg)" ]; then
+        echo "Install ffmpeg!"
+        exit 1
+fi
 
 if ! [ -f "$1" ]; then
         echo "file '$1' does not exist"
