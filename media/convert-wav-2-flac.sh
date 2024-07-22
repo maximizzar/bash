@@ -7,7 +7,7 @@ fi
 
 if [ -f "$1" ]; then
         FILENAME="${1%.*}"
-        ffmpeg -i "$1" -c:a flac -compression_level 8 "$FILENAME.flac"
+        ffmpeg -i "$1" -c:a flac -compression_level 12 "$FILENAME.flac"
 
         if command -v loudgain &> /dev/null; then
                 loudgain -s e "$FILENAME.flac"
