@@ -61,10 +61,10 @@ alias neofetch='neofetch --title_fqdn on --speed_shorthand on --cpu_temp C --mem
 alias fzf='fzf --color 16'
 
 # yt-dlp defaults
-alias yt-dlp=           'yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail'
-alias yt-dlp-adn=       'yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/animationdigitalnetwork.conf'
-alias yt-dlp-hypnotube= 'yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/hypnotube.conf'
-alias yt-dlp-pornhub=   'yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/pornhub.conf'
+alias yt-dlp='           yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail'
+alias yt-dlp-adn='       yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/animationdigitalnetwork.conf'
+alias yt-dlp-hypnotube=' yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/hypnotube.conf'
+alias yt-dlp-pornhub='   yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/pornhub.conf'
 
 # gallery-dl defaults
 alias gallery-dl='gallery-dl --mtime date'
