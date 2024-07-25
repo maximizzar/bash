@@ -5,7 +5,7 @@ WORKING_DIR=""
 MODEL_PATH="$WORKING_DIR/models"
 SOURCE_FULL_PATH="$1"
 
-if [ WORKING_DIR == "" ]; then
+if [ "$WORKING_DIR" == "" ]; then
         echo "please set WORKING_DIR var! Please use absolute a Path!" && exit 1
 else
         mkdir -p "$WORKING_DIR" && cd "$WORKING_DIR" || exit 1
@@ -17,6 +17,11 @@ if [ -n "$2" ]; then
 else
         MODEL="uniscale_restore"
 fi
+
+if [ -n "$3" ]; then
+        echo "Provide a scale as a number. 1 uses input res. 2 Double that..."
+fi
+
 
 # if in install mode, install dependencies
 if [ "$1" == "install" ]; then
@@ -90,7 +95,7 @@ fi
 cd original || exit 1
   if ls *.png 1> /dev/null 2>&1; then
       for frame in *.png; do
-          sub_dir=$(printf "%03d" $((10#$(basename "$frame" .png) / 1000)))
+          sub_dir=$(printf "%03d" $((10#$(basename "$frame" .png) / 100)))
           mkdir -p "$sub_dir" && mkdir -p "../upscale/$MODEL/$sub_dir"
           mv "$frame" "$sub_dir/"
       done
@@ -104,7 +109,7 @@ if [ "$(find "original" -type f | wc -l)" -ne "$(find "upscale/$MODEL" -maxdepth
                 cd original || exit 1
                 for sub_dir in */; do
                           if [ "$(find "$sub_dir" -maxdepth 1 -type f | wc -l)" -ne "$(find ../upscale/"$MODEL"/"$sub_dir" -maxdepth 1 -type f | wc -l)" ]; then
-                                    (cd ../ && upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s 2 -m "$MODEL_PATH" -n "$MODEL" -f png -c 0)
+                                    (cd ../ && upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s "$3" -m "$MODEL_PATH" -n "$MODEL" -f png -c 100)
                           fi
                 done
         )
