@@ -1,15 +1,13 @@
 # list short
-alias ls='eza --long --across --dereference --all --smart-group --numeric --time-style '+%Y-%m-%d' --no-permissions --octal-permissions'
-
+alias ls='eza --long --grid --across --dereference --all --smart-group --numeric --time-style '+%Y-%m-%d'       --no-permissions --octal-permissions'
 # list alt
-alias la='eza --long --across --dereference --all --smart-group --numeric --time-style long-iso --git --git-repos --extended --context'
-
+alias la='eza --long --grid --across --dereference --all --smart-group --mounts --numeric --time-style long-iso'
 # list long
-alias ll='eza --long --across --dereference --all --smart-group --mounts --time-style long-iso --no-permissions --octal-permissions --git --git-repos --extended --context'
+alias ll='eza --long        --across --dereference --all --smart-group --mounts           --time-style long-iso --no-permissions --octal-permissions --git --git-repos --extended --context'
 
 # list tree
 lt() {
-        if [ $1 = "" ]; then
+        if [ -z "$1" ]; then
                 eza --tree --all
         else
                 eza --tree --all --level "$1"
@@ -63,7 +61,10 @@ alias neofetch='neofetch --title_fqdn on --speed_shorthand on --cpu_temp C --mem
 alias fzf='fzf --color 16'
 
 # yt-dlp defaults
-alias yt-dlp='yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats  --write-subs --netrc --audio-quality 0 --embed-metadata --embed-thumbnail --xattrs'
+alias yt-dlp='           yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail'
+alias yt-dlp-adn='       yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/animationdigitalnetwork.conf'
+alias yt-dlp-hypnotube=' yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/hypnotube.conf'
+alias yt-dlp-pornhub='   yt-dlp --no-restrict-filenames --mtime --quiet --progress --prefer-free-formats --write-subs --audio-quality 0 --embed-metadata --embed-thumbnail --config-locations ~/.yt-dlp/pornhub.conf'
 
 # gallery-dl defaults
 alias gallery-dl='gallery-dl --mtime date'

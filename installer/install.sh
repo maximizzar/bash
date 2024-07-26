@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Installer to install dependencies
-# If not used scripts will tell you what they need
+# If you don't want to install everything no problem
+#   scripts will tell you what they need
 
 # Install sudo to use it in the following scripts.
 # If you use something different put it into the alias
@@ -23,6 +24,11 @@ fi
 if ! [ "$(command -v nala)" ]; then
         curl https://gitlab.com/volian/volian-archive/-/raw/main/install-nala.sh | bash
         # sudo apt install -t nala nala
+fi
+
+# Install ffmpeg to handle media correctly
+if ! [ "$(command -v ffmepg)" ]; then
+        sudo nala install ffmepg
 fi
 
 # Install loud-gain to add Replay-gain to audio-tracks
@@ -61,6 +67,9 @@ fi
 if ! [ "$(command -v shellcheck)" ]; then
         sudo nala install shellcheck
 fi
+
+# Install Python3-full, because Python is everywhere .--. (very optional)
+sudo nala install python3-full
 
 # Install pipx to have an easier time with python-based Apps
 if ! [ "$(command -v pipx)" ]; then

@@ -1,4 +1,11 @@
 #!/bin/bash
+# reencodes only the video stream to av1.
+
+# Make sure every Program is installed for the script to run!
+if ! [ "$(command -v ffmpeg)" ]; then
+        echo "Install ffmpeg!"
+        exit 1
+fi
 
 mkdir re-encode
 
