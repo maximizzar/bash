@@ -1,0 +1,277 @@
+{
+  "extractor": {
+    "base-directory": "",
+    "parent-directory": false,
+    "postprocessors": null,
+    "archive": "~/.config/gallery-dl/archive.sqlite3",
+    "archive-pragma": [
+      "journal_mode=WAL",
+      "synchronous=NORMAL"
+    ],
+    "cookies": null,
+    "cookies-update": true,
+    "proxy": null,
+    "skip": true,
+
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.",
+    "retries": 4,
+    "timeout": 30.0,
+    "verify": true,
+    "fallback": true,
+
+    "sleep": 0,
+    "sleep-request": 0,
+    "sleep-extractor": 0,
+
+    "path-restrict": {
+      "\\": "⧹",
+      "/" : "⧸",
+      "|" : "￨",
+      ":" : "꞉",
+      "*" : "∗",
+      "?" : "？",
+      "\"": "″",
+      "<" : "﹤",
+      ">" : "﹥"
+    },
+    "path-replace": "_",
+    "path-remove": "\\u0000-\\u001f\\u007f",
+    "path-strip": "auto",
+    "path-extended": true,
+
+    "extension-map": {
+      "jpeg": "jpg",
+      "jpe": "jpg",
+      "jfif": "jpg",
+      "jif": "jpg",
+      "jfi": "jpg",
+      "tif": "tiff"
+    },
+
+    "blogger": {
+      "videos": true
+    },
+    "cyberdrop": {
+      "domain": null
+    },
+    "danbooru": {
+      "username": null,
+      "password": "${DANBOORU_API_KEY}",
+      "external": false,
+      "metadata": false,
+      "ugoira": false
+    },
+    "deviantart": {
+      "client-id": "${DEVIANTART_CLIENT_ID}",
+      "client-secret": "${DEVIANTART_CLIENT_SECRET}",
+      "refresh-token": "${DEVIANTART_REFRESH_TOKEN}",
+
+      "auto-watch": false,
+      "auto-unwatch": false,
+      "comments": false,
+      "extra": false,
+      "flat": true,
+      "folders": false,
+      "group": true,
+      "include": "gallery",
+      "journals": "html",
+      "jwt": false,
+      "mature": true,
+      "metadata": false,
+      "original": true,
+      "pagination": "api",
+      "public": true,
+      "quality": 100,
+      "wait-min": 0
+    },
+    "gelbooru": {
+      "api-key": "${GELBOORU_API_KEY}",
+      "user-id": "${GELBOORU_USER_ID}",
+      "archive": "~/.config/gallery-dl/archive-gelbooru.sqlite3",
+      "directory": ["{category}", "{search_tags}", "{date:%Y}"],
+      "filename": "{id} [{md5}].{extension}"
+    },
+    "gelbooru_v01": {
+      "censoredbooru": {"root": "https://censored.booru.org"},
+      "archive": "~/.config/gallery-dl/archive-Censored-booru.sqlite3",
+
+      "directory": ["{category}", "{uploader}", "{date:%Y}"],
+      "filename": "[{id}-{date:%Y-%M-%d}] {md5}.{extension}",
+      "options": {
+        "--mtime": "metadata"
+      }
+
+    },
+    "gofile": {
+      "api-token": null,
+      "website-token": null
+    },
+    "hentaifoundry": {
+      "include": "pictures"
+    },
+    "imagechest": {
+      "access-token": "${IMAGECHEST_ACCESS_TOKEN}",
+      "archive": "~/.config/gallery-dl/archive-image-chest.sqlite3",
+      "directory": ["{category}", "{username}", "{date:%Y}","{title}"],
+      "filename": "{filename}:{num}.{extension}"
+    },
+    "imgur": {
+      "mp4": true
+    },
+    "instagram": {
+      "api": "rest",
+      "cookies": null,
+      "include": "posts",
+      "order-files": "asc",
+      "order-posts": "asc",
+      "previews": false,
+      "sleep-request": [
+        6.0,
+        12.0
+      ],
+      "videos": true
+    },
+    "mangadex": {
+      "api-server": "https://api.mangadex.org",
+      "api-parameters": null,
+      "lang": null,
+      "ratings": [
+        "safe",
+        "suggestive",
+        "erotica",
+        "pornographic"
+      ]
+    },
+    "oauth": {
+      "browser": true,
+      "cache": true,
+      "host": "localhost",
+      "port": 6414
+    },
+    "patreon": {
+      "archive": "~/.config/gallery-dl/archive-patreon.sqlite3",
+      "directory": ["Patreon", "{creator['full_name']}", "{date:%Y}"],
+      "filename": "{title} {num}.{extension}",
+
+      "cookies": {
+        "session_id": "${PATREON_SESSION_ID}"
+      }
+    },
+    "pixiv": {
+      "archive": "~/.config/gallery-dl/archive-pixiv.sqlite3",
+      "directory": ["Pixiv", "{user['account']}", "{date:%Y}", "{id}"],
+      "filename": "{num}.{extension}",
+
+      "refresh-token": "cache",
+      "include": "artworks",
+      "embeds": false,
+      "metadata": true,
+      "metadata-bookmark": false,
+      "tags": "japanese",
+      "ugoira": true
+    },
+    "fanbox": {
+      "archive": "~/.config/gallery-dl/archive-fanbox.sqlite3",
+      "directory": ["Fanbox", "{creatorId!c}", "{date:%Y}", "{id}"],
+      "filename": "{num}.{extension}",
+      "cookies": {
+        "FANBOXSESSID": "${FANBOXSESSID}"
+      },
+      "output": {
+        "template": "{{ 'cover' if isCoverImage else title + ' ' + num }}.{extension}"
+      }
+    },
+    "reddit": {
+      "archive": "~/.config/gallery-dl/archive-reddit.sqlite3",
+      "directory": ["Reddit", "{author}", "{date:%Y}", "{id}: {title}"],
+      "filename": "{num}.{extension}",
+
+      "client-id": null,
+      "refresh-token": null,
+      "comments": 0,
+      "morecomments": false,
+      "date-min": 0,
+      "date-max": 253402210800,
+      "date-format": "%Y-%m-%dT%H:%M:%S",
+      "id-min": null,
+      "id-max": null,
+      "recursion": 0,
+      "videos": true
+    },
+    "redgifs": {
+      "format": [
+        "hd",
+        "sd",
+        "gif"
+      ]
+    },
+    "subscribestar": {
+      "username": null,
+      "password": null
+    },
+    "ytdl": {
+      "enabled": true,
+      "format": null,
+      "generic": true,
+      "logging": true,
+      "module": null,
+      "raw-options": null
+    },
+    "zerochan": {
+      "username": null,
+      "password": null,
+      "metadata": false
+    },
+    "booru": {
+      "tags": false,
+      "notes": false
+    }
+  },
+
+  "downloader": {
+    "filesize-min": null,
+    "filesize-max": null,
+    "mtime": true,
+    "part": true,
+    "part-directory": null,
+    "progress": 3.0,
+    "rate": null,
+    "retries": 4,
+    "timeout": 30.0,
+    "verify": true,
+
+    "http": {
+      "adjust-extensions": true,
+      "chunk-size": 32768,
+      "headers": null,
+      "validate": true
+    },
+
+    "ytdl": {
+      "enabled": true,
+      "format": null,
+      "forward-cookies": false,
+      "logging": true,
+      "module": null,
+      "outtmpl": null,
+      "raw-options": null
+    }
+  },
+
+  "output": {
+    "mode": "auto",
+    "progress": true,
+    "shorten": true,
+    "ansi": false,
+    "colors": {
+      "success": "1;32",
+      "skip": "2"
+    },
+    "skip": true,
+    "log": "[{name}][{levelname}] {message}",
+    "logfile": null,
+    "unsupportedfile": null
+  },
+
+  "netrc": false
+}

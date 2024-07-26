@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # extract audio from video
 
+# Make sure every Program is installed for the script to run!
+if ! [ "$(command -v ffmpeg)" ]; then
+        echo "Install ffmpeg!"
+        exit 1
+fi
+
 if [ "$1" != "" ]; then
         # Extract audio codec from the input file
         audio_codec=$(ffmpeg -i "$1" 2>&1 | grep -oP 'Audio: \K[^,]+' | awk '{print $1}')
@@ -31,5 +37,8 @@ if [ "$1" != "" ]; then
 fi
 
 if [ "$(command -v loudgain)" ]; then
-        loudgain -s e --quiet "$filename.flac"
+        loudgain -s e --quiet "$filename.$output_container"
+else
+        echo "Couldn't add Replay-gain to Output."
+        echo "Install loudgain if you want to have Replay-gain tags!"
 fi

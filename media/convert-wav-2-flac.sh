@@ -1,8 +1,10 @@
 #!/bin/bash
+# converts a wav into a flac file
 
-if ! command -v ffmpeg &> /dev/null; then
-        echo "Install ffmpeg"
-        exit 1;
+# Make sure every Program is installed for the script to run!
+if ! [ "$(command -v ffmpeg)" ]; then
+        echo "Install ffmpeg!"
+        exit 1
 fi
 
 if [ -f "$1" ]; then
