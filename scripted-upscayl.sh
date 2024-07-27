@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Set Path vars
-WORKING_DIR="/mnt/up/"
+WORKING_DIR="/media/maximizzar/upscayl"
 MODEL_PATH="$WORKING_DIR/models"
 SOURCE_FULL_PATH="$1"
+start_time=$(date +%s)
 
 if [ "$WORKING_DIR" == "" ]; then
         echo "please set WORKING_DIR var! Please use absolute a Path!" && exit 1
@@ -109,20 +110,28 @@ if [ "$(find "original" -type f | wc -l)" -ne "$(find "upscale/$MODEL" -maxdepth
                 cd original || exit 1
                 for sub_dir in */; do
                           if [ "$(find "$sub_dir" -maxdepth 1 -type f | wc -l)" -ne "$(find ../upscale/"$MODEL"/"$sub_dir" -maxdepth 1 -type f | wc -l)" ]; then
-                                    (cd ../ && upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s "$3" -m "$MODEL_PATH" -n "$MODEL" -f png -c 0)
+                                    (
+                                            cd ../
+                                            SECONDS=0
+                                            upscayl -i "original/$sub_dir" -o "upscale/$MODEL/$sub_dir" -s "$3" -j 2:4:6 -m "$MODEL_PATH" -n "$MODEL" -f png > /dev/null 2>&1
+                                            echo "Batch $sub_dir took $SECONDS seconds to compute!"
+                                    )
                           fi
                 done
         )
 
         (
                 # move frames into upscale/$MODEL dir, because idk how to deal with sub-dirs in ffmpeg
-                cd "upscayl/$MODEL" || exit 1
-                for sub_dir in */; do
-                        mv ./*.png ../
-                done
+                cd "upscale/$MODEL" || exit 1
+                mv ./*/*.png .
+                rmdir ./*
         )
 fi
 
 # Get Video Resolution and generate output file.
-Resolution=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$SOURCE_FULL_PATH")
-ffmpeg -i "$SOURCE_FULL_PATH" -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -map_metadata 0 -map 1:v:0 -map 0 -map -0:v:0 -c copy -c:v:0 libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -s "$Resolution" "$SOURCE_VIDEO"
+Resolution=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "upscale/$MODEL/1.png")
+ffmpeg -i "$SOURCE_FULL_PATH" -framerate "$FRAMERATE" -i "upscale/$MODEL/%d.png" -map_metadata 0 -map 1:v:0 -map 0 -map -0:v:0 -c copy -c:v:0 libsvtav1 -crf 23 -b:v 0 -r "$FRAMERATE" -s "$Resolution" -max_interleave_delta 0 "../$SOURCE_VIDEO"
+
+end_time=$(date +%s)
+execution_time=$((end_time - start_time))
+echo "Execution time: $execution_time seconds"
