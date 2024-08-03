@@ -25,6 +25,9 @@ if [ "$1" != "" ]; then
             ogg)
                 output_container="ogg"
                 ;;
+            opus)
+                output_container="ogg"
+              ;;
             *)
                 echo "Unsupported audio codec: $audio_codec"
                 exit 1
