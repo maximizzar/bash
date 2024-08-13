@@ -11,6 +11,7 @@ mkdir re-encode
 
 # Only a single file
 if [ "$1" ]; then
+    file="$1"
     ffmpeg -i "$file" -map 0 -c copy -c:v libsvtav1 -crf 23 -b:v 0 "re-encode/$file"
     exit 0
 fi
