@@ -5,6 +5,23 @@ usage() {
         echo "Default scale-factor is 2."
 }
 
+disk_usage() {
+        THRESHOLD=90
+        while 1; do
+                # Get the disk usage percentage of the root filesystem
+                USAGE=$(df / | grep / | awk '{ print $5 }' | sed 's/%//g')
+
+                # Check if the usage is greater than or equal to the threshold
+                if [ "$USAGE" -ge "$THRESHOLD" ]; then
+                    echo "Warning: Disk usage is at ${USAGE}%, which is above the threshold of ${THRESHOLD}%."
+                    sleep 10
+                else
+                    echo "Disk usage is at ${USAGE}%, which is below the threshold."
+                    break
+                fi
+        done
+}
+
 video_to_frames() {(
         # split video into its frames
         source_video_length_in_frames="$(ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=nb_read_frames -of default=nokey=1:noprint_wrappers=1 -i "$source_video_path")"
@@ -40,6 +57,7 @@ upscale_frames() {(
                 cd original || exit 1
                 for sub_dir in */; do
                           if [ "$(find "$sub_dir" -maxdepth 1 -type f | wc -l)" -ne "$(find "../upscale/$sub_dir" -maxdepth 1 -type f | wc -l)" ]; then
+                                  disk_usage
                                   SECONDS=0
                                   if ! upscayl -i "../original/$sub_dir" -o "../upscale/$sub_dir" -s "$scale_factor" -j 2:4:4 -m "$upscayl_models" -n "$upscayl_model" -f png > /dev/null; then
                                           exit $?
