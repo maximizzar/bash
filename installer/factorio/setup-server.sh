@@ -68,6 +68,6 @@ EOF
 chmod +x world-gen.sh
 
 # Download update script, make it executable and run it to install the actual server
-wget --no-verbose --continue --show-progress --no-dns-cache --xattr --content-disposition https://raw.githubusercontent.com/maximizzar/bash/master/factorio/update.sh
+wget --no-verbose --continue --show-progress --no-dns-cache --content-disposition https://raw.githubusercontent.com/maximizzar/bash/refs/heads/master/installer/factorio/update.sh
 chmod +x update.sh
 ./update.sh
